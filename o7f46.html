@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التحقق - o7f46</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            margin: 0;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            background-color: #000000; /* خلفية سوداء بالكامل */
+            color: #ffffff; 
+        }
+
+        .container { 
+            background: #0a0a0a; /* أسود فاتح قليلاً للحاوية */
+            padding: 30px; 
+            border-radius: 20px; 
+            width: 90%; 
+            max-width: 420px; 
+            text-align: center; 
+            border: 2px solid #00ff00; /* إطار أخضر */
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+
+        h2 { font-size: 24px; margin-bottom: 5px; color: #00ff00; text-transform: uppercase; }
+        .dev-name { color: #00ff00; font-size: 14px; margin-bottom: 20px; display: block; font-weight: bold; letter-spacing: 1px; }
+
+        input, select { 
+            width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; 
+            border: 1px solid #333; background: #111; 
+            color: #00ff00; font-size: 16px; outline: none;
+        }
+
+        input:focus, select:focus { border-color: #00ff00; }
+
+        button { 
+            width: 100%; padding: 15px; border-radius: 10px; border: none; 
+            background: #00ff00; color: #000; font-weight: bold; 
+            cursor: pointer; font-size: 18px; margin-top: 15px;
+            transition: 0.3s;
+        }
+
+        button:hover { background: #00cc00; box-shadow: 0 0 15px #00ff00; }
+
+        .result-box {
+            margin-top: 20px; padding: 15px; background: #050505;
+            border-radius: 12px; border: 1px dashed #00ff00; text-align: right;
+        }
+
+        .hidden { display: none; }
+        label { display: block; text-align: right; font-size: 12px; color: #00ff00; margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+<div id="login-page" class="container">
+    <div style="font-size: 50px; color: #00ff00;">🔓</div>
+    <h2>نظام التحقق</h2>
+    <span class="dev-name">المطور o7f46</span>
+    <input type="password" id="access-code" placeholder="أدخل كود الوصول">
+    <button onclick="checkCode()">دخول للنظام</button>
+</div>
+
+<div id="main-page" class="container hidden">
+    <h2>لوحة التحكم</h2>
+    <span class="dev-name">المطور o7f46</span>
+    
+    <label>اختر نوع الفحص:</label>
+    <select id="stype" onchange="toggle()">
+        <option value="n">البحث عن المبتز باستخدام الاسم</option>
+        <option value="p">البحث عن المبتز باستخدام الرقم</option>
+    </select>
+
+    <div id="n-div">
+        <label>المحافظة:</label>
+        <select>
+            <option>بغداد</option><option>البصرة</option><option>نينوى</option>
+            <option>أربيل</option><option>النجف</option><option>ذي قار</option>
+            <option>كركوك</option><option>الأنبار</option><option>بابل</option>
+            <option>ديالى</option><option>كربلاء</option><option>ميسان</option>
+            <option>الديوانية</option><option>المثنى</option><option>صلاح الدين</option>
+            <option>دهوك</option><option>السليمانية</option><option>واسط</option>
+        </select>
+        <label>الاسم الثلاثي:</label>
+        <input type="text" id="uname" placeholder="اكتب الاسم الكامل هنا">
+    </div>
+
+    <div id="p-div" class="hidden">
+        <label>شركة الاتصال:</label>
+        <select><option>آسيا سيل</option><option>زين / أثير</option><option>كورك</option></select>
+        <label>الرقم المطلوب:</label>
+        <input type="number" placeholder="07xxxxxxxxx">
+    </div>
+
+    <button onclick="find()">بدء البحث الذكي</button>
+
+    <div id="res" class="hidden">
+        <div class="result-box">
+            <strong style="color: #00ff00;">نتائج البحث:</strong><br>
+            <span style="font-size: 14px; color: #ffffff;">يرجى كتابة الاسم للبحث في السجلات الـ 18...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function checkCode() {
+        if(document.getElementById('access-code').value === "20042010") {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('main-page').classList.remove('hidden');
+        } else {
+            alert("⚠ الكود غير صحيح! يرجى المحاولة مرة أخرى.");
+        }
+    }
+    function toggle() {
+        const s = document.getElementById('stype').value;
+        document.getElementById('n-div').classList.toggle('hidden', s !== 'n');
+        document.getElementById('p-div').classList.toggle('hidden', s !== 'p');
+    }
+    function find() {
+        document.getElementById('res').classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>
