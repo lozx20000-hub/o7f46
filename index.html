@@ -16,14 +16,20 @@
         .hidden { display: none !important; }
         label { display: block; text-align: right; font-size: 12px; color: #00ff00; margin: 5px 5px 0 0; }
         
-        /* تأثير القفل */
-        .lock-icon { font-size: 50px; color: #00ff00; margin-bottom: 10px; }
+        /* تصميم القفل المضيء */
+        .lock-container {
+            font-size: 60px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px #00ff00;
+            display: block;
+        }
     </style>
 </head>
 <body>
 
 <div id="login-page" class="container">
-    <div class="lock-icon">🔓</div> <h2>نظام التحقق</h2>
+    <div class="lock-container">🔓</div>
+    <h2>نظام التحقق</h2>
     <span class="dev-name">المطور o7f46</span>
     <input type="password" id="access-code" placeholder="أدخل كود الوصول">
     <button onclick="checkCode()">دخول للنظام</button>
@@ -58,31 +64,35 @@
 
     <div id="p-div" class="hidden">
         <label>شركة الاتصال:</label>
-        <select><option>آسيا سيل</option><option>زين / أثير</option><option>كورك</option></select>
+        <select>
+            <option>آسيا سيل</option>
+            <option>زين / أثير</option>
+            <option>كورك</option>
+        </select>
         <label>الرقم المطلوب:</label>
         <input type="number" id="uphone" placeholder="91xxxxxxxxxx">
     </div>
 
     <div id="ip-div" class="hidden">
         <label>أدخل عنوان الـ IP:</label>
-        <input type="text" id="target-ip" placeholder="مثال: 130.193.246.163">
+        <input type="text" id="target-ip" placeholder="مثال: 1.1.1.1">
     </div>
 
     <div id="cam-div" class="hidden">
-        <label>رابط صفحة التمويه:</label>
-        <input type="text" placeholder="أدخل الرابط">
+        <label>رابط التمويه:</label>
+        <input type="text" placeholder="https://example.com">
     </div>
 
     <div id="apk-div" class="hidden">
-        <label>اسم التطبيق المستهدف:</label>
-        <input type="text" placeholder="WhatsApp Gold">
+        <label>اسم التطبيق:</label>
+        <input type="text" placeholder="WhatsApp Plus">
     </div>
 
     <button onclick="find()">بدء البحث الذكي</button>
 
     <div id="res" class="hidden">
         <div class="result-box" id="result-content">
-            <strong style="color: #00ff00;">نتائج البحث:</strong><br>
+            <strong style="color: #00ff00;">النتائج:</strong><br>
             <span id="res-text" style="font-size: 14px; color: #ffffff;">...</span>
         </div>
     </div>
@@ -100,10 +110,9 @@
         const s = document.getElementById('stype').value;
         const divs = ['n-div', 'p-div', 'ip-div', 'cam-div', 'apk-div'];
         divs.forEach(id => {
-            const el = document.getElementById(id);
-            if (id === s + '-div') { el.classList.remove('hidden'); } 
-            else { el.classList.add('hidden'); }
+            document.getElementById(id).classList.add('hidden');
         });
+        document.getElementById(s + '-div').classList.remove('hidden');
         document.getElementById('res').classList.add('hidden');
     }
 
@@ -112,30 +121,26 @@
         const resDiv = document.getElementById('res');
         const resText = document.getElementById('res-text');
         resDiv.classList.remove('hidden');
-        resText.innerHTML = "جاري الاتصال بالسيرفر...";
+        resText.innerHTML = "جاري المعالجة...";
 
         if (type === 'ip') {
             const ip = document.getElementById('target-ip').value.trim();
-            if(!ip) { resText.innerText = "يرجى كتابة الـ IP"; return; }
+            if(!ip) { resText.innerText = "اكتب الـ IP أولاً"; return; }
             try {
                 const response = await fetch(`https://ipapi.co/${ip}/json/`);
                 const data = await response.json();
-                if (data.error) { resText.innerHTML = "❌ الـ IP غير صحيح."; } 
-                else {
-                    resText.innerHTML = `🌍 الدولة: ${data.country_name}<br>🏙️ المدينة: ${data.city}<br>🏢 الشركة: ${data.org}<br>📍 الإحداثيات: ${data.latitude}, ${data.longitude}`;
-                }
-            } catch (e) { resText.innerText = "⚠️ فشل في جلب البيانات."; }
+                resText.innerHTML = `🌍 الدولة: ${data.country_name}<br>🏙️ المدينة: ${data.city}<br>🏢 المزود: ${data.org}`;
+            } catch (e) { resText.innerText = "⚠️ فشل جلب بيانات الـ IP"; }
         } else if (type === 'p') {
             const phone = document.getElementById('uphone').value.trim();
-            if(!phone) { resText.innerText = "يرجى إدخال الرقم"; return; }
             try {
                 const response = await fetch('data.csv');
                 const text = await response.text();
                 const found = text.split('\n').find(l => l.includes(phone));
                 resText.innerText = found ? "✅ تم العثور: " + found : "❌ غير موجود";
-            } catch(e) { resText.innerText = "⚠️ خطأ في ملف data.csv"; }
+            } catch(e) { resText.innerText = "⚠️ ملف data.csv غير موجود"; }
         } else {
-            resText.innerHTML = "جاري التجهيز... النظام بانتظار استجابة الهدف.";
+            resText.innerHTML = "جاري الاتصال... النظام بانتظار الهدف.";
         }
     }
 </script>
