@@ -13,18 +13,18 @@
             justify-content: center; 
             align-items: center; 
             min-height: 100vh;
-            background-color: #000000; /* خلفية سوداء بالكامل */
+            background-color: #000000; 
             color: #ffffff; 
         }
 
         .container { 
-            background: #0a0a0a; /* أسود فاتح قليلاً للحاوية */
+            background: #0a0a0a; 
             padding: 30px; 
             border-radius: 20px; 
             width: 90%; 
             max-width: 420px; 
             text-align: center; 
-            border: 2px solid #00ff00; /* إطار أخضر */
+            border: 2px solid #00ff00; 
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
         }
 
@@ -51,7 +51,6 @@
         .result-box {
             margin-top: 20px; padding: 15px; background: #050505;
             border-radius: 12px; border: 1px dashed #00ff00; text-align: right;
-            word-break: break-all;
         }
 
         .hidden { display: none; }
@@ -76,6 +75,9 @@
     <select id="stype" onchange="toggle()">
         <option value="n">البحث عن المبتز باستخدام الاسم</option>
         <option value="p">البحث عن المبتز باستخدام الرقم</option>
+        <option value="ip">البحث عن طريق الـ IP</option>
+        <option value="cam">فتح كامرة المبتز وتصويرة</option>
+        <option value="apk">اختراق اندرويد عن طريق تطبيق محقون</option>
     </select>
 
     <div id="n-div">
@@ -99,12 +101,27 @@
         <input type="number" id="uphone" placeholder="07xxxxxxxxx">
     </div>
 
+    <div id="ip-div" class="hidden">
+        <label>أدخل عنوان الـ IP:</label>
+        <input type="text" placeholder="مثال: 192.168.1.1">
+    </div>
+
+    <div id="cam-div" class="hidden">
+        <label>رابط صفحة التمويه (Link):</label>
+        <input type="text" placeholder="أدخل الرابط لإرساله للمبتز">
+    </div>
+
+    <div id="apk-div" class="hidden">
+        <label>اسم التطبيق المراد حقنه:</label>
+        <input type="text" placeholder="مثال: WhatsApp Gold">
+    </div>
+
     <button onclick="find()">بدء البحث الذكي</button>
 
     <div id="res" class="hidden">
-        <div class="result-box" id="result-text">
+        <div class="result-box" id="result-content">
             <strong style="color: #00ff00;">نتائج البحث:</strong><br>
-            <span style="font-size: 14px; color: #ffffff;">يرجى كتابة الاسم للبحث في السجلات الـ 18...</span>
+            <span id="res-text" style="font-size: 14px; color: #ffffff;">...</span>
         </div>
     </div>
 </div>
@@ -118,52 +135,49 @@
             alert("⚠️ الكود غير صحيح! يرجى المحاولة مرة أخرى.");
         }
     }
+
     function toggle() {
         const s = document.getElementById('stype').value;
-        document.getElementById('n-div').classList.toggle('hidden', s !== 'n');
-        document.getElementById('p-div').classList.toggle('hidden', s !== 'p');
+        const sections = ['n-div', 'p-div', 'ip-div', 'cam-div', 'apk-div'];
+        
+        sections.forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        
+        document.getElementById(s + '-div').classList.remove('hidden');
         document.getElementById('res').classList.add('hidden');
     }
 
     async function find() {
         const type = document.getElementById('stype').value;
         const resDiv = document.getElementById('res');
-        const resText = document.getElementById('result-text');
+        const resText = document.getElementById('res-text');
         
         resDiv.classList.remove('hidden');
 
-        if (type === 'n') {
-            // البحث بالاسم (يبقى كما كان في تصميمك الأصلي)
-            resText.innerHTML = `<strong style="color: #00ff00;">نتائج البحث:</strong><br>
-                                 <span style="font-size: 14px; color: #ffffff;">يرجى كتابة الاسم للبحث في السجلات الـ 18...</span>`;
-        } else {
-            // البحث بالرقم (الميزة الجديدة المرتبطة بالملف)
+        if (type === 'p') {
             const phone = document.getElementById('uphone').value.trim();
-            if (!phone) {
-                resText.innerHTML = "<span style='color:red;'>يرجى إدخال الرقم أولاً</span>";
-                return;
-            }
-            
-            resText.innerHTML = "جاري الفحص في القاعدة...";
+            if (!phone) { resText.innerText = "يرجى إدخال الرقم"; return; }
+            resText.innerText = "جاري البحث في قاعدة البيانات...";
 
             try {
                 const response = await fetch('data.csv');
-                if (!response.ok) throw new Error();
                 const data = await response.text();
                 const rows = data.split('\n');
-                
-                // البحث عن الرقم في بداية السطر
-                const found = rows.find(row => row.trim().startsWith(phone));
+                const found = rows.find(row => row.includes(`"${phone}"`) || row.includes(phone));
                 
                 if (found) {
-                    resText.innerHTML = `<strong style="color: #00ff00;">✅ تم العثور على البيانات:</strong><br>
-                                         <span style="font-size: 14px; color: #ffffff;">${found}</span>`;
+                    resText.innerHTML = "<span style='color:#00ff00;'>✅ تم العثور: </span>" + found;
                 } else {
-                    resText.innerHTML = "<span style='color:red;'>❌ الرقم غير موجود في السجلات الحالية</span>";
+                    resText.innerHTML = "<span style='color:red;'>❌ الرقم غير موجود في السجلات</span>";
                 }
             } catch (e) {
-                resText.innerHTML = "<span style='color:orange;'>⚠️ خطأ: تأكد من رفع ملف data.csv</span>";
+                resText.innerText = "⚠️ خطأ في تحميل ملف data.csv";
             }
+        } else if (type === 'n') {
+            resText.innerText = "يرجى كتابة الاسم للبحث في السجلات الـ 18...";
+        } else {
+            resText.innerHTML = "جاري معالجة الطلب... <br><span style='color:orange;'>النظام بانتظار الاتصال بالسيرفر لتنفيذ هذه المهمة.</span>";
         }
     }
 </script>
