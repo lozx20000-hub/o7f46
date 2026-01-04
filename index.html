@@ -40,11 +40,26 @@
     </select>
 
     <div id="n-div">
+        <label>المحافظة:</label>
+        <select>
+            <option>بغداد</option><option>البصرة</option><option>نينوى</option>
+            <option>أربيل</option><option>النجف</option><option>ذي قار</option>
+            <option>كركوك</option><option>الأنبار</option><option>بابل</option>
+            <option>ديالى</option><option>كربلاء</option><option>ميسان</option>
+            <option>الديوانية</option><option>المثنى</option><option>صلاح الدين</option>
+            <option>دهوك</option><option>السليمانية</option><option>واسط</option>
+        </select>
         <label>الاسم الثلاثي:</label>
         <input type="text" placeholder="اكتب الاسم الكامل هنا">
     </div>
 
     <div id="p-div" class="hidden">
+        <label>شركة الاتصال:</label>
+        <select>
+            <option>آسيا سيل</option>
+            <option>زين / أثير</option>
+            <option>كورك</option>
+        </select>
         <label>الرقم المطلوب:</label>
         <input type="number" id="uphone" placeholder="91xxxxxxxxxx">
     </div>
@@ -95,31 +110,19 @@
         const resDiv = document.getElementById('res');
         const resText = document.getElementById('res-text');
         resDiv.classList.remove('hidden');
-        resText.innerHTML = "جاري الاتصال بالسيرفر المشفر...";
+        resText.innerHTML = "جاري الاتصال بالسيرفر...";
 
         if (type === 'ip') {
             const ip = document.getElementById('target-ip').value.trim();
             if(!ip) { resText.innerText = "يرجى كتابة الـ IP"; return; }
-            
             try {
-                // استخدمنا هنا سيرفر يدعم HTTPS ليعمل الموقع بشكل سليم
                 const response = await fetch(`https://ipapi.co/${ip}/json/`);
                 const data = await response.json();
-                
-                if (data.error) {
-                    resText.innerHTML = "❌ الـ IP غير صحيح أو غير مدعوم.";
-                } else {
-                    resText.innerHTML = `
-                        🌍 الدولة: ${data.country_name}<br>
-                        🏙️ المدينة: ${data.city}<br>
-                        🏢 الشركة (ISP): ${data.org}<br>
-                        📍 الإحداثيات: ${data.latitude}, ${data.longitude}<br>
-                        ⏰ التوقيت: ${data.timezone}
-                    `;
+                if (data.error) { resText.innerHTML = "❌ الـ IP غير صحيح."; } 
+                else {
+                    resText.innerHTML = `🌍 الدولة: ${data.country_name}<br>🏙️ المدينة: ${data.city}<br>🏢 الشركة: ${data.org}<br>📍 الإحداثيات: ${data.latitude}, ${data.longitude}`;
                 }
-            } catch (e) {
-                resText.innerText = "⚠️ فشل في جلب البيانات. جرب IP آخر أو تأكد من الشبكة.";
-            }
+            } catch (e) { resText.innerText = "⚠️ فشل في جلب البيانات."; }
         } else if (type === 'p') {
             const phone = document.getElementById('uphone').value.trim();
             try {
