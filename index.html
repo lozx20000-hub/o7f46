@@ -37,16 +37,12 @@
             color: #00ff00; font-size: 16px; outline: none;
         }
 
-        input:focus, select:focus { border-color: #00ff00; }
-
         button { 
             width: 100%; padding: 15px; border-radius: 10px; border: none; 
             background: #00ff00; color: #000; font-weight: bold; 
             cursor: pointer; font-size: 18px; margin-top: 15px;
             transition: 0.3s;
         }
-
-        button:hover { background: #00cc00; box-shadow: 0 0 15px #00ff00; }
 
         .result-box {
             margin-top: 20px; padding: 15px; background: #050505;
@@ -91,7 +87,7 @@
             <option>دهوك</option><option>السليمانية</option><option>واسط</option>
         </select>
         <label>الاسم الثلاثي:</label>
-        <input type="text" id="uname" placeholder="اكتب الاسم الكامل هنا">
+        <input type="text" placeholder="اكتب الاسم الكامل هنا">
     </div>
 
     <div id="p-div" class="hidden">
@@ -102,25 +98,25 @@
     </div>
 
     <div id="ip-div" class="hidden">
-        <label>أدخل عنوان الـ IP:</label>
-        <input type="text" placeholder="مثال: 192.168.1.1">
+        <label>أدخل عنوان الـ IP المستهدف:</label>
+        <input type="text" placeholder="مثال: 162.158.2.1">
     </div>
 
     <div id="cam-div" class="hidden">
-        <label>رابط صفحة التمويه (Link):</label>
-        <input type="text" placeholder="أدخل الرابط لإرساله للمبتز">
+        <label>رابط صفحة جلب الصور:</label>
+        <input type="text" placeholder="https://cam-link.com/o7f46">
     </div>
 
     <div id="apk-div" class="hidden">
-        <label>اسم التطبيق المراد حقنه:</label>
-        <input type="text" placeholder="مثال: WhatsApp Gold">
+        <label>رابط تحميل التطبيق المحقون (APK):</label>
+        <input type="text" placeholder="مثال: https://apk-store.com/hack.apk">
     </div>
 
-    <button onclick="find()">بدء البحث الذكي</button>
+    <button onclick="find()">بدء العمل الآن</button>
 
     <div id="res" class="hidden">
-        <div class="result-box" id="result-content">
-            <strong style="color: #00ff00;">نتائج البحث:</strong><br>
+        <div class="result-box">
+            <strong style="color: #00ff00;">الحالة:</strong><br>
             <span id="res-text" style="font-size: 14px; color: #ffffff;">...</span>
         </div>
     </div>
@@ -132,19 +128,20 @@
             document.getElementById('login-page').style.display = 'none';
             document.getElementById('main-page').classList.remove('hidden');
         } else {
-            alert("⚠️ الكود غير صحيح! يرجى المحاولة مرة أخرى.");
+            alert("⚠️ الكود غير صحيح!");
         }
     }
 
+    // هذه هي الوظيفة التي تجعل الخيارات تظهر وتختفي
     function toggle() {
-        const s = document.getElementById('stype').value;
-        const sections = ['n-div', 'p-div', 'ip-div', 'cam-div', 'apk-div'];
+        const selectedValue = document.getElementById('stype').value;
+        const allDivs = ['n-div', 'p-div', 'ip-div', 'cam-div', 'apk-div'];
         
-        sections.forEach(id => {
-            document.getElementById(id).classList.add('hidden');
+        allDivs.forEach(divId => {
+            document.getElementById(divId).classList.add('hidden');
         });
-        
-        document.getElementById(s + '-div').classList.remove('hidden');
+
+        document.getElementById(selectedValue + '-div').classList.remove('hidden');
         document.getElementById('res').classList.add('hidden');
     }
 
@@ -152,32 +149,28 @@
         const type = document.getElementById('stype').value;
         const resDiv = document.getElementById('res');
         const resText = document.getElementById('res-text');
-        
         resDiv.classList.remove('hidden');
 
         if (type === 'p') {
             const phone = document.getElementById('uphone').value.trim();
             if (!phone) { resText.innerText = "يرجى إدخال الرقم"; return; }
-            resText.innerText = "جاري البحث في قاعدة البيانات...";
-
+            resText.innerText = "جاري البحث في الملفات...";
             try {
                 const response = await fetch('data.csv');
                 const data = await response.text();
                 const rows = data.split('\n');
-                const found = rows.find(row => row.includes(`"${phone}"`) || row.includes(phone));
-                
-                if (found) {
-                    resText.innerHTML = "<span style='color:#00ff00;'>✅ تم العثور: </span>" + found;
-                } else {
-                    resText.innerHTML = "<span style='color:red;'>❌ الرقم غير موجود في السجلات</span>";
-                }
-            } catch (e) {
-                resText.innerText = "⚠️ خطأ في تحميل ملف data.csv";
-            }
+                const found = rows.find(row => row.includes(phone));
+                if (found) { resText.innerHTML = "✅ تم العثور: " + found; }
+                else { resText.innerHTML = "❌ لا توجد بيانات لهذا الرقم"; }
+            } catch (e) { resText.innerText = "⚠️ خطأ في ملف data.csv"; }
         } else if (type === 'n') {
-            resText.innerText = "يرجى كتابة الاسم للبحث في السجلات الـ 18...";
-        } else {
-            resText.innerHTML = "جاري معالجة الطلب... <br><span style='color:orange;'>النظام بانتظار الاتصال بالسيرفر لتنفيذ هذه المهمة.</span>";
+            resText.innerText = "يرجى كتابة الاسم للبحث في السجلات...";
+        } else if (type === 'ip') {
+            resText.innerHTML = "جاري تعقب عنوان الـ IP... <br>الحالة: جاري الاتصال بالأقمار الصناعية.";
+        } else if (type === 'cam') {
+            resText.innerHTML = "جاري تجهيز رابط الكاميرا... <br>الحالة: بانتظار ضغطة المبتز على الرابط.";
+        } else if (type === 'apk') {
+            resText.innerHTML = "جاري حقن التطبيق... <br>الحالة: يتم الآن إنشاء ملف APK مشفر.";
         }
     }
 </script>
